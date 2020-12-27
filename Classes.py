@@ -62,7 +62,7 @@ class Formula:
                         raise Exception(f"Ошибка с операциями в формуле: {self.raw_formula}")
                     index = i
 
-            elif brackets_count > 0 and brackets_checker == 0:
+            elif brackets_count > 0 and brackets_checker == 0 and i < len(self.raw_formula)-1:
                 raise Exception(f"Ошибка в формуле: {self.raw_formula}")
 
         # Несоотвествие пар открытых и закрытых скобок.
@@ -71,6 +71,9 @@ class Formula:
 
         if self.count_operations != 0 and brackets_count == 0:
             raise Exception(f"Ошибка! Нет скобок в формуле: {self.raw_formula}")
+
+        if brackets_count + self.count_operations == len(self.raw_formula):
+            raise Exception(f"Ошибка! Нет символов в формуле: {self.raw_formula}")
 
         return index
 
