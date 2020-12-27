@@ -43,7 +43,7 @@ def is_mp_rule(formula, formulas):
 
 #%% Чтение из всех файлов и запись в виде формул.
 # Именно тут происходит проверка на то, является ли строка формулой или нет (выбрасывается ошибка в консоль/терминал).
-h_reader = open("hypotheses.txt", 'r')
+h_reader = open("data/hypotheses.txt", 'r')
 try:
     raw_hypotheses = h_reader.read().split('\n')
     # Преобразуем к виду формул, игнорируя пустые строки.
@@ -55,7 +55,7 @@ except Exception as ex:
 finally:
     h_reader.close()
 
-ax_reader = open("axioms.txt", 'r')
+ax_reader = open("data/axioms.txt", 'r')
 try:
     raw_axioms = ax_reader.read().split('\n')
     # Преобразуем к виду формул, игнорируя пустые строки.
@@ -67,7 +67,7 @@ except Exception as ex:
 finally:
     ax_reader.close()
 
-p_reader = open("proof.txt", 'r')
+p_reader = open("data/proof.txt", 'r')
 try:
     raw_formulas = p_reader.read().split('\n')
     # Преобразуем к виду формул, игнорируя пустые строки.
@@ -101,5 +101,5 @@ if is_deduce:
 
 #%% Вывод в консоль/терминал и запись в файл.
 print(result)
-with open("proof_with_notes.txt", 'w') as writer:
+with open("data/proof_with_notes.txt", 'w') as writer:
     writer.write(result)
