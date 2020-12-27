@@ -32,10 +32,6 @@ class Formula:
         index = -1
 
         for i, symbol in enumerate(self.raw_formula):
-            if symbol in ['∨', '∧', '¬', '→']:
-                self.count_operations += 1
-                if self.raw_formula[i-1] in ['∨', '∧', '¬', '→'] or self.raw_formula[i+1] in ['∨', '∧', '¬', '→']:
-                    raise Exception(f"Ошибка с повторной операцией в формуле: {self.raw_formula}")
             if symbol in ['(', ')']:
                 brackets_count += 1
 
@@ -43,18 +39,28 @@ class Formula:
                 brackets_checker += 1
             elif symbol == ')':
                 brackets_checker -= 1
-            elif symbol == '¬' and self.raw_formula[i-1] != '(':
-                raise Exception(f"Ошибка в использовании операции ¬ в формуле: {self.raw_formula}")
-            elif symbol in ['∨', '∧', '→'] and (self.raw_formula[i-1] == '(' or self.raw_formula[i+1] == ')'):
-                raise Exception(f"Ошибка с операциями в формуле: {self.raw_formula}")
-            elif brackets_checker == -1:
-                # Лишняя закрывающая скобка.
+
+            if brackets_checker == -1:
+                # Закрытая скобка до открытой.
                 raise Exception(f"Ошибка со скобками в формуле: {self.raw_formula}")
-            elif brackets_checker == 1 and symbol in ['∨', '∧', '¬', '→']:
-                if index != -1:
-                    # Неверная формула, например: (А→В→С)
+
+            if symbol in ['∨', '∧', '¬', '→']:
+                self.count_operations += 1
+
+                if self.raw_formula[i-1] in ['∨', '∧', '¬', '→'] or self.raw_formula[i+1] in ['∨', '∧', '¬', '→']:
+                    raise Exception(f"Ошибка с повторной операцией в формуле: {self.raw_formula}")
+
+                elif symbol in ['∨', '∧', '→'] and (self.raw_formula[i-1] == '(' or self.raw_formula[i+1] == ')'):
                     raise Exception(f"Ошибка с операциями в формуле: {self.raw_formula}")
-                index = i
+
+                elif symbol == '¬' and (self.raw_formula[i-1] != '(' or self.raw_formula[i+1] == ')'):
+                    raise Exception(f"Ошибка в использовании операции ¬ в формуле: {self.raw_formula}")
+
+                elif brackets_checker == 1:
+                    if index != -1:
+                        # Неверная формула, например: (А→В→С)
+                        raise Exception(f"Ошибка с операциями в формуле: {self.raw_formula}")
+                    index = i
 
         # Несоотвествие пар открытых и закрытых скобок.
         if brackets_checker != 0:
