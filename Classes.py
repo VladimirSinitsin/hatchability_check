@@ -79,34 +79,7 @@ def equal_formulas(axiom, formula):
     :param formula: формула
     :return: соответсвует или нет
     """
-    # Для запоминания структуры формул используем вложенную функцию, чтобы хранить общие переменные во внешнем фрейме.
     ax_dict = {}
-    form_dict = {}
-    ax_structure = []
-    form_structure = []
-
-    def update_structure(expression, feature):
-        """
-        Обновляет словари и порядки.
-        :param expression: функция.
-        :param feature: характеристика (аксиома или формула), какие переменные обновлять.
-        :return: None
-        """
-        nonlocal ax_dict
-        nonlocal form_dict
-        nonlocal ax_structure
-        nonlocal form_structure
-
-        if feature == 'axiom':
-            if expression not in ax_dict:
-                # Задаём каждому выражению свой номер, который потом используем в структуре вызовов.
-                ax_dict[expression] = len(ax_dict)
-            ax_structure.append(ax_dict[expression])
-        else:
-            if expression not in form_dict:
-                # Задаём каждому выражению свой номер, который потом используем в структуре вызовов.
-                form_dict[expression] = len(form_dict)
-            form_structure.append(form_dict[expression])
 
     def equal_tree(axiom, formula):
         """
@@ -115,11 +88,14 @@ def equal_formulas(axiom, formula):
         :param formula: формула
         :return: соответсвует или нет
         """
+        nonlocal ax_dict
+
         if axiom.operation == 'symbol':
-            # Если дошли до "листа" дерева структуры акиомы, то обновляем структуры и сравниваем их.
-            update_structure(axiom.right, 'axiom')
-            update_structure(formula.raw_formula, 'formula')
-            return ax_structure == form_structure
+            if axiom.right not in ax_dict:
+                ax_dict[axiom.right] = formula.raw_formula
+                return True
+            else:
+                return ax_dict[axiom.right] == formula.raw_formula
 
         if axiom.operation != formula.operation:
             return False
