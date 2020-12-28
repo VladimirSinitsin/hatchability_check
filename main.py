@@ -43,41 +43,44 @@ def is_mp_rule(formula, formulas):
 
 #%% Чтение из всех файлов и запись в виде формул.
 # Именно тут происходит проверка на то, является ли строка формулой или нет (выбрасывается ошибка в консоль/терминал).
-h_reader = open("data/hypotheses.txt", 'r')
-try:
+with open("data/hypotheses.txt", 'r') as h_reader:
     raw_hypotheses = h_reader.read().split('\n')
     # Преобразуем к виду формул, игнорируя пустые строки.
-    hypotheses = [Classes.Formula(h) for h in raw_hypotheses if h]
-except Exception as ex:
-    print('Ошибка в файле hypotheses.txt:')
-    print(ex)
-    sys.exit(0)
-finally:
-    h_reader.close()
+    hypotheses = []
+    for hyp in raw_hypotheses:
+        if hyp:
+            try:
+                hypotheses.append(Classes.Formula(hyp))
+            except:
+                print('Ошибка в файле hypotheses.txt:')
+                print(f"Ошибка в формуле: {hyp}")
+                sys.exit(1)
 
-ax_reader = open("data/axioms.txt", 'r')
-try:
+with open("data/axioms.txt", 'r') as ax_reader:
     raw_axioms = ax_reader.read().split('\n')
     # Преобразуем к виду формул, игнорируя пустые строки.
-    axioms = [Classes.Formula(ax) for ax in raw_axioms if ax]
-except Exception as ex:
-    print('Ошибка в файле axioms.txt:')
-    print(ex)
-    sys.exit(0)
-finally:
-    ax_reader.close()
+    axioms = []
+    for ax in raw_axioms:
+        if ax:
+            try:
+                axioms.append(Classes.Formula(ax))
+            except:
+                print('Ошибка в файле axioms.txt:')
+                print(f"Ошибка в формуле: {ax}")
+                sys.exit(1)
 
-p_reader = open("data/proof.txt", 'r')
-try:
+with open("data/proof.txt", 'r') as p_reader:
     raw_formulas = p_reader.read().split('\n')
     # Преобразуем к виду формул, игнорируя пустые строки.
-    formulas = [Classes.Formula(f) for f in raw_formulas if f]
-except Exception as ex:
-    print('Ошибка в файле proof.txt:')
-    print(ex)
-    sys.exit(0)
-finally:
-    p_reader.close()
+    formulas = []
+    for p in raw_formulas:
+        if p:
+            try:
+                formulas.append(Classes.Formula(p))
+            except:
+                print('Ошибка в файле proof.txt:')
+                print(f"Ошибка в формуле: {p}")
+                sys.exit(1)
 
 
 #%% Проверка вывода.

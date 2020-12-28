@@ -13,6 +13,12 @@ class Formula:
             self.left = self.raw_formula[1:index_operation]
             self.right = self.raw_formula[index_operation + 1:-1]
 
+            if self.operation == '¬' and self.left:
+                raise Exception
+
+        if not _rec_checker(self):
+            raise Exception
+
     def __eq__(self, other):
         if self.raw_formula == other.raw_formula:
             return True
@@ -31,55 +37,54 @@ class Formula:
         brackets_count = 0
         index = -1
 
-        for i, symbol in enumerate(self.raw_formula):
-            if symbol in ['(', ')']:
-                brackets_count += 1
+        if len(self.raw_formula) == 0:
+            raise Exception
 
-            if symbol == '(':
-                if i != len(self.raw_formula)-1 and self.raw_formula[i+1] == ')':
-                    raise Exception(f"Ошибка со скобками в формуле: {self.raw_formula}")
-                brackets_checker += 1
-            elif symbol == ')':
-                if i != len(self.raw_formula)-1 and self.raw_formula[i+1] == '(':
-                    raise Exception(f"Ошибка со скобками в формуле: {self.raw_formula}")
-                brackets_checker -= 1
+        elif len(self.raw_formula) == 1:
+            if self.raw_formula[0] in ['∨', '∧', '¬', '→', '(', ')']:
+                raise Exception
+            return index
 
-            if brackets_checker == -1:
-                # Закрытая скобка до открытой.
-                raise Exception(f"Ошибка со скобками в формуле: {self.raw_formula}")
+        else:
+            if self.raw_formula[0] != '(' and self.raw_formula[-1] != ')':
+                raise Exception
 
-            if symbol in ['∨', '∧', '¬', '→']:
-                self.count_operations += 1
+            for i, symbol in enumerate(self.raw_formula):
+                if symbol in ['(', ')']:
+                    brackets_count += 1
 
-                if self.raw_formula[i-1] in ['∨', '∧', '¬', '→'] or self.raw_formula[i+1] in ['∨', '∧', '¬', '→']:
-                    raise Exception(f"Ошибка с повторной операцией в формуле: {self.raw_formula}")
+                if symbol == '(':
+                    brackets_checker += 1
+                elif symbol == ')':
+                    brackets_checker -= 1
 
-                elif symbol in ['∨', '∧', '→'] and (self.raw_formula[i-1] == '(' or self.raw_formula[i+1] == ')'):
-                    raise Exception(f"Ошибка с операциями в формуле: {self.raw_formula}")
+                elif symbol in ['∨', '∧', '¬', '→']:
+                    self.count_operations += 1
 
-                elif symbol == '¬' and (self.raw_formula[i-1] != '(' or self.raw_formula[i+1] == ')'):
-                    raise Exception(f"Ошибка в использовании операции ¬ в формуле: {self.raw_formula}")
+                    if brackets_checker == 1:
+                        index = i
 
-                elif brackets_checker == 1:
-                    if index != -1:
-                        # Неверная формула, например: (А→В→С)
-                        raise Exception(f"Ошибка с операциями в формуле: {self.raw_formula}")
-                    index = i
+                if brackets_count > 0 and brackets_checker == 0 and i < len(self.raw_formula)-1:
+                    raise Exception
 
-            elif brackets_count > 0 and brackets_checker == 0 and i < len(self.raw_formula)-1:
-                raise Exception(f"Ошибка в формуле: {self.raw_formula}")
+            # Несоотвествие пар открытых и закрытых скобок.
+            if brackets_checker != 0:
+                raise Exception
 
-        # Несоотвествие пар открытых и закрытых скобок.
-        if brackets_checker != 0:
-            raise Exception(f"Ошибка со скобками в формуле: {self.raw_formula}")
-
-        if self.count_operations != 0 and brackets_count == 0:
-            raise Exception(f"Ошибка! Нет скобок в формуле: {self.raw_formula}")
-
-        if brackets_count + self.count_operations == len(self.raw_formula):
-            raise Exception(f"Ошибка! Нет символов в формуле: {self.raw_formula}")
+            if self.count_operations == 0 and brackets_count != 0:
+                raise Exception
 
         return index
+
+
+def _rec_checker(formula):
+    if formula.operation == 'symbol':
+        return True
+
+    left_check = _rec_checker(Formula(formula.left)) if formula.operation != '¬' else True
+    right_check = _rec_checker(Formula(formula.right))
+
+    return left_check and right_check
 
 
 def equal_formulas(axiom, formula):
