@@ -36,8 +36,12 @@ class Formula:
                 brackets_count += 1
 
             if symbol == '(':
+                if i != len(self.raw_formula)-1 and self.raw_formula[i+1] == ')':
+                    raise Exception(f"Ошибка со скобками в формуле: {self.raw_formula}")
                 brackets_checker += 1
             elif symbol == ')':
+                if i != len(self.raw_formula)-1 and self.raw_formula[i+1] == '(':
+                    raise Exception(f"Ошибка со скобками в формуле: {self.raw_formula}")
                 brackets_checker -= 1
 
             if brackets_checker == -1:
